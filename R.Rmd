@@ -17,6 +17,7 @@ El siguiente estudio está basado en los datos publicados por el usuario Miguel 
 Haciendo uso de técnicas de análisis de datos en el lenguaje de programación **R**, se ha determinado:
 
 ```{r, echo = FALSE}
+library(ggplot2)
 female_data <- read.csv('female_names.csv', header = TRUE)
 male_data <- read.csv('male_names.csv', header = TRUE)
 
@@ -31,6 +32,8 @@ El nombre femenino mas repetido ha sido **`r female_max$name `** con una aparici
 ## Gráfica de nombres femeninos repetidos
 
 ```{r}
-ggplot(data=female_data, aes(female_data$mean_age, binwidth = 3)) + 
-    geom_histogram(binwidth = 5, alpha = .4, color = 'red', fill = 'red')
+library(ggplot2)
+ggplot(data=female_data, aes(female_data$mean_age)) +
+  geom_histogram(binwidth = 5, alpha = .4, color = 'red', fill = 'red', position = 'dodge') +
+  labs(title='Media de edades género femenino', x='Media de edades', y='Cantidad de nombres')
 ```
