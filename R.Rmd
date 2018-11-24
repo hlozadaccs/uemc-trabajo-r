@@ -1,0 +1,36 @@
+---
+title: "UEMC R"
+author: "Héctor Lozada"
+date: "19 de noviembre de 2018"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+INFORME A SUAVECITO.ES
+======================
+
+El siguiente estudio está basado en los datos publicados por el usuario Miguel Gil en la red social [kaggle](https://www.kaggle.com/).
+
+# Estudio y análisis de datos
+
+Haciendo uso de técnicas de análisis de datos en el lenguaje de programación **R**, se ha determinado:
+
+```{r, echo = FALSE}
+female_data <- read.csv('female_names.csv', header = TRUE)
+male_data <- read.csv('male_names.csv', header = TRUE)
+
+female_max <- female_data[which.max(female_data$frequency),]
+male_max <- male_data[which.max(male_data$frequency),]
+```
+
+## Cantidad de nombres femeninos y masculinos con mayor frecuencia
+
+El nombre femenino mas repetido ha sido **`r female_max$name `** con una aparición de **`r format(female_max$frequency, digits=9, big.mark=" ", small.interval=3)`**, por otra parte el nombre masculino mas repetido ha sido **`r male_max$name `** con una aparición de **`r format(male_max$frequency, digits=9, big.mark=" ", small.interval=3)`**
+
+## Gráfica de nombres femeninos repetidos
+
+```{r}
+ggplot(data=female_data, aes(female_data$mean_age, binwidth = 3)) + 
+    geom_histogram(binwidth = 5, alpha = .4, color = 'red', fill = 'red')
+```
