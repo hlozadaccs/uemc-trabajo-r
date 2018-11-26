@@ -4,7 +4,6 @@ author: "Héctor Lozada"
 date: "19 de noviembre de 2018"
 output:
   pdf_document: default
-  word_document: default
   html_document: default
 ---
 
@@ -19,12 +18,26 @@ Haciendo uso de técnicas de análisis de datos en el lenguaje de programación 
 
 ```{r, echo = FALSE}
 library(ggplot2)
-library(reshape2)
 female_data <- read.csv('female_names.csv', header = TRUE)
 male_data <- read.csv('male_names.csv', header = TRUE)
 
 female_max <- female_data[which.max(female_data$frequency),]
 male_max <- male_data[which.max(male_data$frequency),]
+
+get_frecuency_range <- function(dataframe, gender) {
+  l <- seq(5, 85, by=5)
+  df <- data.frame(mean_age = numeric(), female_count = numeric())
+  
+  for (i in seq_along(l)) {
+    temp_data <- dataframe[dataframe$mean_age >= (l[i] - 5) & dataframe$mean_age < l[i], ]
+    df <- rbind(df, data.frame(
+      gender = gender,
+      mean_age = l[i],
+      frecuency = sum(temp_data$frequency)))    
+  }
+
+  return (df)
+}
 ```
 
 ## Cantidad de nombres femeninos y masculinos con mayor frecuencia
@@ -33,37 +46,28 @@ El nombre femenino mas repetido ha sido **`r female_max$name `** con una aparici
 
 ## Gráfica de nombres femeninos
 
-```{r, echo = FALSE}
-ggplot(data=female_data, aes(female_data$mean_age)) +
-  geom_histogram(binwidth = 5, alpha = .4, color = 'red', fill = 'red', position = 'dodge') +
+```{r}
+female_frequency_range <- get_frecuency_range(female_data, 'female')
+ggplot(data=female_frequency_range, aes(x=mean_age, y=frecuency)) +
+  geom_histogram(stat='identity', alpha = .4, color = 'red', fill = 'red', position = 'dodge') +
   labs(title='Media de edades género femenino', x='Media de edades', y='Cantidad de nombres')
 ```
 
 ## Gráfica de nombres masculinos
 
 ```{r, echo = FALSE}
-ggplot(data=male_data, aes(male_data$mean_age)) +
-  geom_histogram(binwidth = 5, alpha = .4, color = 'blue', fill = 'blue', position = 'dodge') +
+male_frequency_range <- get_frecuency_range(male_data, 'male')
+ggplot(data=male_frequency_range, aes(x=mean_age, y=frecuency)) +
+  geom_histogram(stat='identity', alpha = .4, color = 'blue', fill = 'blue', position = 'dodge') +
   labs(title='Media de edades género masculino', x='Media de edades', y='Cantidad de nombres')
 ```
 
-## Frecuencia de media de edades femenino vs masculino
+## Gráfica combinada
 
 ```{r, echo = FALSE}
-df <- data.frame(range_age = numeric(), female_count = numeric(), male_count = numeric())
-for (i in seq_along(l)) {
-    female_count = nrow(female_data[female_data$mean_age <= l[i], ]) - nrow(female_data[female_data$mean_age <= l[i-1], ])
-    male_count = nrow(male_data[male_data$mean_age <= l[i], ]) - nrow(male_data[male_data$mean_age <= l[i-1], ])
-
-    df <- rbind(df, data.frame(
-        range_age = l[i],
-        female_count = female_count,
-        male_count = male_count))
-}
-df <- melt(df, id.vars='range_age', value.name='frequency')
-
-ggplot(df, aes(x=range_age, y=frequency, fill=variable)) +
-    geom_bar(stat="identity", width=4, position = "dodge") +
-    labs(title='Media de edades género masculino', x='Media de edades', y='Cantidad de nombres') +
-    scale_fill_manual("Legenda", values = c("female_count" = "red", "male_count" = "blue"), breaks=c("female_count", "male_count"), labels=c('Femenino', 'Masculino'))
+combined_data <- rbind(female_frequency_range, male_frequency_range)
+ggplot(combined_data, aes(x=mean_age, y=frecuency, fill=gender)) +
+  geom_bar(stat="identity", width=4, position = "dodge") +
+  labs(title='Media de edades géneros masculino y femenino', x='Media de edades', y='Cantidad de nombres') +
+  scale_fill_manual("Leyenda", values = c("female" = "red", "male" = "blue"), breaks=c("female", "male"), labels=c('Femenino', 'Masculino'))
 ```
