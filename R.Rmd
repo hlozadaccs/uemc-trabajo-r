@@ -18,11 +18,6 @@ Haciendo uso de técnicas de análisis de datos en el lenguaje de programación 
 
 ```{r, echo = FALSE, message=FALSE, warning=FALSE}
 library(ggplot2)
-female_data <- read.csv('female_names.csv', header = TRUE)
-male_data <- read.csv('male_names.csv', header = TRUE)
-
-female_max <- female_data[which.max(female_data$frequency),]
-male_max <- male_data[which.max(male_data$frequency),]
 
 get_frecuency_range <- function(dataframe, gender) {
   l <- seq(5, 85, by=5)
@@ -39,9 +34,30 @@ get_frecuency_range <- function(dataframe, gender) {
   return (df)
 }
 
-count_names <- function(name) {
-    return (sapply(gregexpr('\\S+', name), length))
+split_names <- function(name) {
+  return (sapply(gregexpr('\\S+', name), length))
 }
+
+count_names <- function(df, quantity) {
+  return (nrow(df[sapply(df$name, split_names) == quantity, ]))
+}
+
+female_data <- read.csv('female_names.csv', header = TRUE)
+male_data <- read.csv('male_names.csv', header = TRUE)
+
+female_name_1 <- count_names(female_data, 1)
+female_name_2 <- count_names(female_data, 2)
+female_name_3 <- count_names(female_data, 3)
+male_name_1 <- count_names(male_data, 1)
+male_name_2 <- count_names(male_data, 2)
+male_name_3 <- count_names(male_data, 3)
+
+female_max <- female_data[which.max(female_data$frequency),]
+male_max <- male_data[which.max(male_data$frequency),]
+
+female_frequency_range <- get_frecuency_range(female_data, 'female')
+male_frequency_range <- get_frecuency_range(male_data, 'male')
+combined_data <- rbind(female_frequency_range, male_frequency_range)
 ```
 
 ## Cantidad de nombres femeninos y masculinos con mayor frecuencia
@@ -51,7 +67,6 @@ El nombre femenino mas repetido ha sido **`r female_max$name `** con una aparici
 ## Gráfica de nombres femeninos
 
 ```{r, echo = FALSE, message=FALSE, warning=FALSE}
-female_frequency_range <- get_frecuency_range(female_data, 'female')
 ggplot(data=female_frequency_range, aes(x=mean_age, y=frecuency)) +
   geom_histogram(stat='identity', alpha = .4, color = 'red', fill = 'red', position = 'dodge') +
   labs(title='Media de edades género femenino', x='Media de edades', y='Cantidad de nombres')
@@ -60,7 +75,6 @@ ggplot(data=female_frequency_range, aes(x=mean_age, y=frecuency)) +
 ## Gráfica de nombres masculinos
 
 ```{r, echo = FALSE, message=FALSE, warning=FALSE}
-male_frequency_range <- get_frecuency_range(male_data, 'male')
 ggplot(data=male_frequency_range, aes(x=mean_age, y=frecuency)) +
   geom_histogram(stat='identity', alpha = .4, color = 'blue', fill = 'blue', position = 'dodge') +
   labs(title='Media de edades género masculino', x='Media de edades', y='Cantidad de nombres')
@@ -69,7 +83,6 @@ ggplot(data=male_frequency_range, aes(x=mean_age, y=frecuency)) +
 ## Gráfica combinada
 
 ```{r, echo = FALSE, message=FALSE, warning=FALSE}
-combined_data <- rbind(female_frequency_range, male_frequency_range)
 ggplot(combined_data, aes(x=mean_age, y=frecuency, fill=gender)) +
   geom_bar(stat="identity", width=4, position = "dodge") +
   labs(title='Media de edades géneros masculino y femenino', x='Media de edades', y='Cantidad de nombres') +
@@ -78,4 +91,15 @@ ggplot(combined_data, aes(x=mean_age, y=frecuency, fill=gender)) +
 
 ## Nombres compuestos
 
-En los documentos evaluados se ha determinado que la cantidad de nombres compuestos es de **`r format(nrow(female_data[sapply(female_data$name, count_names) > 1, ]), digits=9, big.mark=" ", small.interval=3)`** de los cuales **`r format(nrow(female_data[sapply(female_data$name, count_names) == 2, ]), digits=9, big.mark=" ", small.interval=3)`** son nombres compuestos por dos nombres y **`r format(nrow(female_data[sapply(female_data$name, count_names) == 3, ]), digits=9, big.mark=" ", small.interval=3)`** son nombres compuestos por tres nombres
+Los nombres compuestos son aquellos que están formados por dos o mas nombres, se evaluó el listado femenino y masculino de nombres llegando a la siguiente conclusión.
+
+En el listado de nombres femeninos se ha determinado que la cantidad de nombres compuestos es de **`r format(female_name_2 + female_name_3, digits=9, big.mark=" ", small.interval=3)`** de los cuales **`r format(female_name_2, digits=9, big.mark=" ", small.interval=3)`** son nombres compuestos por dos nombres y **`r format(female_name_3, digits=9, big.mark=" ", small.interval=3)`** son nombres compuestos por tres nombres
+
+En el listado de nombres masculinos la cantidad de nombres compuestos son de **`r format(male_name_2 + male_name_3, digits=9, big.mark=" ", small.interval=3)`**, **`r format(male_name_2, digits=9, big.mark=" ", small.interval=3)`** son nombres compuestos por dos nombres y **`r format(male_name_3, digits=9, big.mark=" ", small.interval=3)`** son nombres compuestos por tres nombres
+
+## Total de nombres simples y compuestos.
+
+```{r, echo = FALSE, message=FALSE, warning=FALSE}
+df <- data.frame(group = c('Nombres femeninos simples', 'Nombres femeninos compuestos', 'Nombres masculinos simples', 'Nombres masculinos compuestos'), value = c(female_name_1, female_name_2 + female_name_3, male_name_1, male_name_2 + male_name_3))
+ggplot(df, aes(x='', y=value, fill=group))+geom_bar(width = 1, stat = 'identity')+coord_polar("y", start=0)
+```
