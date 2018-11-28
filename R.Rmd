@@ -18,6 +18,7 @@ Haciendo uso de técnicas de análisis de datos en el lenguaje de programación 
 
 ```{r, echo = FALSE, message=FALSE, warning=FALSE}
 library(ggplot2)
+library (knitr)
 
 get_frecuency_range <- function(dataframe, gender) {
   l <- seq(5, 85, by=5)
@@ -40,6 +41,10 @@ split_names <- function(name) {
 
 count_names <- function(df, quantity) {
   return (nrow(df[sapply(df$name, split_names) == quantity, ]))
+}
+
+count_frequency_letter <- function(df, letter) {
+    return (nrow(df[grep(paste('^', letter, sep=''), df$name), ]))
 }
 
 female_data <- read.csv('female_names.csv', header = TRUE)
@@ -101,5 +106,21 @@ En el listado de nombres masculinos la cantidad de nombres compuestos son de **`
 
 ```{r, echo = FALSE, message=FALSE, warning=FALSE}
 df <- data.frame(group = c('Nombres femeninos simples', 'Nombres femeninos compuestos', 'Nombres masculinos simples', 'Nombres masculinos compuestos'), value = c(female_name_1, female_name_2 + female_name_3, male_name_1, male_name_2 + male_name_3))
-ggplot(df, aes(x='', y=value, fill=group))+geom_bar(width = 1, stat = 'identity')+coord_polar("y", start=0)
+ggplot(df, aes(x='', y=value, fill=group)) + 
+  geom_bar(width = 1, stat = 'identity') +
+  coord_polar("y", start=0)
 ```
+
+## Total de nombres por letra.
+
+```{r}
+total_letters <- data.frame(letter <- character(), total_female <- numeric(), total_male <- numeric())
+for (letter in LETTERS) {
+    total_letters <- rbind(total_letters, data.frame(
+        letter = letter,
+        total_female = count_frequency_letter(female_data, letter),
+        total_male = count_frequency_letter(male_data, letter)))
+}
+```
+
+`r kable(total_letters)`
