@@ -186,7 +186,7 @@ ggplot(simple_compound_names, aes(x='', y=value, fill=group)) +
 
 ## Total de nombres por letra.
 
-`r kable(count_letters)`
+`r kable(count_letters, col.names=c('Letra', 'Total femenino', 'Total masculino'))`
 
 ## Total de nombres que empiezan por la misma letra
 
@@ -207,8 +207,9 @@ ggplot(sum_frequency_revert, aes(x=letter, y=total, fill=variable)) +
 
 ## TOP 10 nombres femeninos mas comunes
 
-`r kable(female_top_10)`
+`r kable(female_top_10, col.names=c('Nombre', 'Cantidad'))`
 
 ## TOP 10 nombres masculinos mas comunes
 
-`r kable(male_top_10)`
+`r kable(male_top_10, col.names=c('Nombre', 'Cantidad'))`
+
