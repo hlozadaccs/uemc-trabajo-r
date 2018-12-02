@@ -148,6 +148,10 @@ total_maria <- sum(filter(female_data, grepl('MARIA', name) & frequency5 < 5)$fr
 total_pilar <- sum(filter(female_data, grepl('PILAR', name) & frequency5 < 5)$frequency5)
 total_juan <- sum(filter(male_data, grepl('PILAR', name) & frequency5 < 5)$frequency5)
 total_david <- sum(filter(male_data, grepl('DAVID', name) & frequency5 < 5)$frequency5)
+
+names <- c('MARIA', 'PILAR', 'JUAN', 'DAVID')
+total <- c(total_maria, total_pilar, total_juan, total_david)
+frequency5 <- data.frame(names <- names, total <- total)
 ```
 
 ## Cantidad de nombres femeninos y masculinos con mayor frecuencia
@@ -224,4 +228,11 @@ ggplot(sum_frequency_revert, aes(x=letter, y=total, fill=variable)) +
 
 `r kable(male_top_10, col.names=c('Nombre', 'Cantidad'))`
 
-## Cantidad de niños con nombres 
+## Menores de cinco años
+
+`r kable(frequency5, col.names=c('Nombre', 'Cantidad'))`
+
+## Conclusión
+
+Se recomienda imprimir pañales personalizados con los siguientes nombres femeninos (`r head(female_data[order(-female_data$frequency5), ]$name, 5) `) y masculinos (`r head(male_data[order(-male_data$frequency5), ]$name, 5) `)
+
