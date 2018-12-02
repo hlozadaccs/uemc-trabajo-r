@@ -20,6 +20,7 @@ Haciendo uso de técnicas de análisis de datos en el lenguaje de programación 
 library(ggplot2)
 library(knitr)
 library(reshape2)
+library(dplyr)
 
 get_frecuency_range <- function(df, gender) {
   vector <- seq(5, 85, by=5)
@@ -137,6 +138,16 @@ new_male_data <- group_dataframe_name(join_male_data)
 # Organizamos en forma descendente por la frecuencia el nuevo set de datos e imprimimos hasta 10
 female_top_10 <- head(new_female_data[order(-new_female_data$frequency), ], 10)
 male_top_10 <- head(new_male_data[order(-new_male_data$frequency), ], 10)
+
+# Ejercicio 9.
+female_data$frequency5 <- trunc(female_data$frequency * pnorm(5, mean=female_data$mean_age, sd=(female_data$mean_age * .25)))
+male_data$frequency5 <- trunc(male_data$frequency * pnorm(5, mean=male_data$mean_age, sd=(male_data$mean_age * .25)))
+
+# Ejercicio 10.
+total_maria <- sum(filter(female_data, grepl('MARIA', name) & frequency5 < 5)$frequency5)
+total_pilar <- sum(filter(female_data, grepl('PILAR', name) & frequency5 < 5)$frequency5)
+total_juan <- sum(filter(male_data, grepl('PILAR', name) & frequency5 < 5)$frequency5)
+total_david <- sum(filter(male_data, grepl('DAVID', name) & frequency5 < 5)$frequency5)
 ```
 
 ## Cantidad de nombres femeninos y masculinos con mayor frecuencia
@@ -213,3 +224,4 @@ ggplot(sum_frequency_revert, aes(x=letter, y=total, fill=variable)) +
 
 `r kable(male_top_10, col.names=c('Nombre', 'Cantidad'))`
 
+## Cantidad de niños con nombres 
